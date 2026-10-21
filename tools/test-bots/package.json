@@ -1,0 +1,12 @@
+{
+  "name": "wtd-test-bots",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Fake phone players for testing What The Dub?! with lots of players",
+  "scripts": {
+    "setup": "npx playwright install chromium"
+  },
+  "dependencies": {
+    "playwright": "1.49.1"
+  }
+}
