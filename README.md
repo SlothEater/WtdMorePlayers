@@ -1,9 +1,11 @@
 # WTD More Players
 
-A mod for [What The Dub?!](https://store.steampowered.com/app/1495860/What_The_Dub/) on Steam that raises the
-player limit from **6 to as many as 31**. Everyone writes dubs and everyone votes on every dub.
+A homebrew mod for [What The Dub?!](https://store.steampowered.com/app/1495860/What_The_Dub/) on Steam.
 
-Normally only 6 people can play and anyone extra goes into the audience. With this mod the extra people play too.
+- **More players:** raises the limit from 6 to as many as 31. Everyone writes dubs and everyone votes on every dub.
+- **Your own clips:** play clip packs you made yourself (for example with the Dub Editor), straight from a
+  folder. Nothing gets uploaded to the Workshop. You can also play *only* your own clips.
+- **A settings window when the game starts:** pick the number of players and turn custom-clips-only on or off.
 
 ## Install
 
@@ -28,9 +30,11 @@ the latest released mod file. If the game is installed somewhere unusual, it ask
 
 ## Playing
 
-1. Start What The Dub?! from Steam and host a game as normal.
-2. Where the TV normally says **playwtd.com**, it now shows an address like **`192.168.1.20:8080`**.
-3. Players on the **same Wi-Fi** open that address on their phones and join with the room code as usual.
+1. Start What The Dub?! from Steam. A **WTD More Players** window opens. Pick the number of players, tick
+   *Only play my custom clips* if you want that, and press **Play**. Press **F8** at any time to open the window again.
+2. Host a game as normal.
+3. Where the TV normally says **playwtd.com**, it now shows an address like **`192.168.1.20:8080`**.
+4. Players on the **same Wi-Fi** open that address on their phones and join with the room code as usual.
 
 The first time, Windows may ask whether What The Dub?! can use the network. Click **Allow** (private networks).
 
@@ -38,9 +42,41 @@ Players who aren't on your Wi-Fi (for example, joining through a stream) can sti
 but the playwtd.com page only has room for 6 choices on the vote screen, so the mod gives each of those
 phones a fair, shuffled selection of 6 dubs to vote from. Phones using the address on the TV see every dub.
 
+## Your own clips
+
+The mod plays every clip pack in the **`CustomClips`** folder inside the game folder. The mod creates that
+folder the first time the game runs. Each pack is a folder with the videos and their subtitles:
+
+```
+WhatTheDub\CustomClips\
+    MyPack\
+        VideoClips\clip1.mp4
+        Subtitles\clip1.srt
+```
+
+An unzipped **Dub Editor** export already has this layout, so you can unzip it straight into `CustomClips`.
+Each `.srt` needs exactly one `[male_dub]` or `[female_dub]` line, marking where the players' dubs go.
+
+Custom clips are mixed in with the normal clips. To play **only** your own clips, tick *Only play my custom clips*
+in the settings window (F8). Your clips show their pack name on screen while they play.
+
+### Converting videos
+
+The game only plays **H.264 MP4** videos. If a pack has other formats, or its subtitles overlap or run past the
+end of the clip, **drag the pack (zip or folder) onto `Add Clip Pack.bat`** (in the download, or
+`tools\clip-packs` in the repo). It converts the videos, fixes the subtitles, and copies the pack into
+`CustomClips`. It needs [Python](https://www.python.org/downloads/) and [ffmpeg](https://www.gyan.dev/ffmpeg/builds/).
+
+```
+python tools\clip-packs\wtd_pack.py add MyPack.zip     # add or convert a pack
+python tools\clip-packs\wtd_pack.py list               # show packs
+python tools\clip-packs\wtd_pack.py remove MyPack      # delete a pack
+```
+
 ## Settings
 
-The settings file is created after you launch the game once with the mod:
+The settings window (F8) covers the usual options. Everything else is in the settings file, which is created
+after you launch the game once with the mod:
 
 `<game folder>\BepInEx\config\com.wtd.moreplayers.cfg`
 
@@ -49,8 +85,13 @@ The settings file is created after you launch the game once with the mod:
 | `MaxPlayers` | `12` | How many people play (write dubs). Anyone after that joins the audience. Can go up to `31`. |
 | `PhonePage.Enabled` | `true` | Serve the phone page from your PC so every phone can vote on every dub. |
 | `PhonePage.Port` | `8080` | Change this if something else on your PC already uses port 8080. |
+| `Clips.CustomOnly` | `false` | Only play clips from the custom clips folder. |
+| `Clips.Folder` | `CustomClips` | Where your clip packs live. A relative path is inside the game folder. |
+| `Launcher.ShowOnStart` | `true` | Show the settings window when the game starts. |
+| `Launcher.Hotkey` | `F8` | The key that opens the settings window. |
 
-Restart the game after changing settings.
+Settings changed in the window take effect for the next game you host. If you edit the file instead,
+restart the game afterwards.
 
 **About the 31 limit:** the online service the game uses allows 32 connections per room. That covers your
 PC, the players and the audience together. With `MaxPlayers = 31` there's no room left for an audience. With
@@ -62,7 +103,7 @@ of playback. Around 12 to 16 players feels best.
 ## Uninstall
 
 Double-click **`uninstall.bat`**. It removes the mod and BepInEx, and the game goes back to normal.
-You can also just verify the game files in Steam.
+Your `CustomClips` folder is kept. Delete it yourself if you don't want your clips any more.
 
 ## Troubleshooting
 

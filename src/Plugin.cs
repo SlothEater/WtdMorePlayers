@@ -34,18 +34,44 @@ namespace WtdMorePlayers
                     "The online room holds 32 connections in total (host + players + audience), so audience space shrinks as this grows.",
                     new AcceptableValueRange<int>(3, 31)));
             PhonePage.Bind(Config);
+            CustomClips.Bind(Config);
+            LauncherWindow.Bind(Config);
 
             ExtendPlayerColors();
             new Harmony("com.wtd.moreplayers").PatchAll();
             Log.LogInfo($"WTD More Players loaded, MaxPlayers = {MaxPlayers.Value}");
 
+            CustomClips.EnsureFolder();
+            LauncherWindow.Init();
+
+            // The game destroys BepInEx's manager object on scene loads, so run per-frame work on our own object.
+            var host = new GameObject("WtdMorePlayers");
+            DontDestroyOnLoad(host);
+            host.hideFlags = HideFlags.HideAndDontSave;
+            var runner = host.AddComponent<Runner>();
             if (PhonePage.Enabled.Value)
-                StartCoroutine(PhonePage.Run());
+                runner.StartCoroutine(PhonePage.Run());
         }
 
-        private void Update() => PhonePage.UpdateLabels();
+        private class Runner : MonoBehaviour
+        {
+            private bool _logged;
 
-        private void OnDestroy() => PhonePage.Stop();
+            private void Update()
+            {
+                if (!_logged)
+                {
+                    _logged = true;
+                    Log.LogInfo("Runner active");
+                }
+                PhonePage.UpdateLabels();
+                LauncherWindow.Update();
+            }
+
+            private void OnGUI() => LauncherWindow.OnGUI();
+
+            private void OnDestroy() => PhonePage.Stop();
+        }
 
         // Called from transpiled code in place of the literal 6.
         public static int GetMaxPlayers() => MaxPlayers.Value;
@@ -71,7 +97,8 @@ namespace WtdMorePlayers
         {
             var colors = GameDataHelper.playerColorsOptions.ToList();
             int i = 0;
-            while (colors.Count < MaxPlayers.Value)
+            // MaxPlayers can change from the launcher window mid-session, so cover the whole range up front.
+            while (colors.Count < ((AcceptableValueRange<int>)MaxPlayers.Description.AcceptableValues).MaxValue)
             {
                 colors.Add(i < ExtraColors.Length
                     ? ExtraColors[i]
