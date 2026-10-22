@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Removes WTD More Players and the BepInEx mod loader from What The Dub?! on macOS or Linux / Steam Deck.
-# Usage: bash uninstall.sh [--game-dir "/path/to/WhatTheDub"] [--keep-bepinex]
+# Usage: ./uninstall.sh [--game-dir "/path/to/WhatTheDub"] [--keep-bepinex]
 # On Windows use uninstall.bat instead.
 
 set -euo pipefail

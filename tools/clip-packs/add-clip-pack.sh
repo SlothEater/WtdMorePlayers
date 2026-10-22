@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Adds a clip pack (zip or folder) to the game's CustomClips folder on macOS or Linux / Steam Deck.
 # Needs python3 (and ffmpeg to convert videos); offers to install them if missing.
-# Usage: bash add-clip-pack.sh MyPack.zip
+# Usage: ./add-clip-pack.sh MyPack.zip
 # On Windows drag the pack onto "Add Clip Pack.bat" instead.
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-[ $# -ge 1 ] || { echo 'Usage: bash add-clip-pack.sh <pack.zip or folder> [--game-dir DIR]'; exit 1; }
+[ $# -ge 1 ] || { echo 'Usage: ./add-clip-pack.sh <pack.zip or folder> [--game-dir DIR]'; exit 1; }
 
 # Prints the command that installs the given packages with this system's package manager.
 install_cmd() {

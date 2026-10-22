@@ -11,21 +11,22 @@ A homebrew mod for [What The Dub?!](https://store.steampowered.com/app/1495860/W
 
 You need What The Dub?! on Steam. Works on:
 
-| Your computer | How the game runs | Installer |
-|---|---|---|
-| Windows | Windows game | `install.bat` |
-| Mac | Native Mac game | `install.sh` |
-| Linux, Steam Deck | Windows game through Proton | `install.sh` |
+| Your computer | How the game runs | Download | Installer |
+|---|---|---|---|
+| Windows | Windows game | [WtdMorePlayers-windows.zip](https://github.com/SlothEater/WtdMorePlayers/releases/latest/download/WtdMorePlayers-windows.zip) | `install.bat` |
+| Mac | Native Mac game | [WtdMorePlayers-mac-linux.tar.gz](https://github.com/SlothEater/WtdMorePlayers/releases/latest/download/WtdMorePlayers-mac-linux.tar.gz) | `install.sh` |
+| Linux, Steam Deck | Windows game through Proton | [WtdMorePlayers-mac-linux.tar.gz](https://github.com/SlothEater/WtdMorePlayers/releases/latest/download/WtdMorePlayers-mac-linux.tar.gz) | `install.sh` |
 
-The installer works out which one you have by itself.
+The download links always get the newest version. `install.sh` works out by itself whether it's on a Mac or
+on Linux.
 
 ### Windows
 
 **Option A: download (easiest)**
 
-1. Go to [Releases](https://github.com/SlothEater/WtdMorePlayers/releases/latest) and download `WtdMorePlayers.zip`.
-2. Extract it anywhere.
-3. Double-click **`install.bat`**.
+1. Download [WtdMorePlayers-windows.zip](https://github.com/SlothEater/WtdMorePlayers/releases/latest/download/WtdMorePlayers-windows.zip).
+2. Right-click it > **Extract All**.
+3. Double-click **`install.bat`** in the extracted folder.
 
 **Option B: clone the repo**
 
@@ -43,12 +44,19 @@ permission for this. If you say no, click **Allow** when Windows asks the first 
 
 ### Mac, Linux and Steam Deck
 
-1. Download `WtdMorePlayers.zip` from [Releases](https://github.com/SlothEater/WtdMorePlayers/releases/latest)
-   and extract it. (Steam Deck: do this in Desktop Mode.)
-2. Open a terminal in the extracted folder and run:
+1. Download [WtdMorePlayers-mac-linux.tar.gz](https://github.com/SlothEater/WtdMorePlayers/releases/latest/download/WtdMorePlayers-mac-linux.tar.gz).
+   (Steam Deck: do this in Desktop Mode.)
+2. Open a terminal in the folder you downloaded it to (usually Downloads) and run:
    ```
-   bash install.sh
+   tar -xzf WtdMorePlayers-mac-linux.tar.gz
+   cd WtdMorePlayers
+   ./install.sh
    ```
+   On a Mac, double-clicking the file in Finder also extracts it. Some Mac browsers extract it by themselves.
+   Either way you end up with a `WtdMorePlayers` folder. Open a terminal there and run `./install.sh`.
+
+   Prefer git? `git clone https://github.com/SlothEater/WtdMorePlayers.git`, then run
+   `./WtdMorePlayers/install/install.sh`.
 3. The installer ends by printing one line to paste into Steam: right-click What The Dub?! > **Properties** >
    **General** > **Launch Options**. It's one of these:
    - **Mac:** `"/path/to/WhatTheDub/run_bepinex.sh" %command%` (the installer prints your exact path)
@@ -58,7 +66,7 @@ permission for this. If you say no, click **Allow** when Windows asks the first 
 
 On Linux, if the `ufw` firewall is on, the installer tells you the command that lets phones connect. On a Mac,
 click **Allow** if macOS asks whether the game may accept incoming connections. To add clip packs, run
-`bash add-clip-pack.sh MyPack.zip` (it offers to install Python and ffmpeg if they're missing).
+`./add-clip-pack.sh MyPack.zip` (it offers to install Python and ffmpeg if they're missing).
 
 > The Mac and Proton modes use the official BepInEx builds for those systems and were tested up to the install
 > step. They haven't been played on a real Mac or Steam Deck yet. If something goes wrong, please open an
@@ -153,7 +161,7 @@ of playback. Around 12 to 16 players feels best.
 ## Uninstall
 
 Double-click **`uninstall.bat`**. It removes the mod, BepInEx and the firewall rule, and the game goes back to normal.
-On Mac/Linux run `bash uninstall.sh`, then clear the Launch Options box in Steam.
+On Mac/Linux run `./uninstall.sh` from the same folder, then clear the Launch Options box in Steam.
 Your `CustomClips` folder is kept. Delete it yourself if you don't want your clips any more.
 
 ## Troubleshooting

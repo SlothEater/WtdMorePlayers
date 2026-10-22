@@ -5,7 +5,7 @@
 #  - installs BepInEx 5 (the mod loader) for that mode if it is not there yet
 #  - copies WtdMorePlayers.dll into BepInEx/plugins
 #  - prints the Steam launch option that turns the mod on
-# Usage: bash install.sh [--game-dir "/path/to/WhatTheDub"]
+# Usage: ./install.sh [--game-dir "/path/to/WhatTheDub"]
 # On Windows use install.bat instead.
 
 set -euo pipefail
