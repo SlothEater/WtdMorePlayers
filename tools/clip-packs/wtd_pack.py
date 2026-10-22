@@ -14,6 +14,7 @@ Usage:
 """
 
 import argparse
+import os
 import re
 import shutil
 import subprocess
@@ -28,14 +29,22 @@ DUB_TAGS = ("[male_dub]", "[female_dub]")
 # ---------- locating the game ----------
 
 def steam_libraries():
-    libs = []
-    try:
-        import winreg
-        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam") as k:
-            libs.append(Path(winreg.QueryValueEx(k, "SteamPath")[0]))
-    except OSError:
-        pass
-    libs.append(Path(r"C:\Program Files (x86)\Steam"))
+    home = Path.home()
+    if sys.platform == "win32":
+        libs = []
+        try:
+            import winreg
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam") as k:
+                libs.append(Path(winreg.QueryValueEx(k, "SteamPath")[0]))
+        except OSError:
+            pass
+        libs.append(Path(r"C:\Program Files (x86)\Steam"))
+    elif sys.platform == "darwin":
+        libs = [home / "Library" / "Application Support" / "Steam"]
+    else:  # Linux / Steam Deck: native, Flatpak and Snap Steam
+        libs = [home / ".steam" / "steam", home / ".local" / "share" / "Steam",
+                home / ".var" / "app" / "com.valvesoftware.Steam" / ".local" / "share" / "Steam",
+                home / "snap" / "steam" / "common" / ".local" / "share" / "Steam"]
     for steam in list(libs):
         vdf = steam / "steamapps" / "libraryfolders.vdf"
         if vdf.is_file():
@@ -44,25 +53,33 @@ def steam_libraries():
     return libs
 
 
+def is_game_dir(d) -> bool:
+    # Windows build (also used on Linux through Proton) or the native Mac .app
+    d = Path(d)
+    return (d / "WhatTheDub.exe").is_file() or any(d.glob("*.app"))
+
+
 def find_game_dir():
     for lib in steam_libraries():
         d = lib / "steamapps" / "common" / "WhatTheDub"
-        if (d / "WhatTheDub.exe").is_file():
+        if d.is_dir() and is_game_dir(d):
             return d
     return None
 
 
 def clips_root(args) -> Path:
     game = args.game_dir or find_game_dir()
-    if not game or not (Path(game) / "WhatTheDub.exe").is_file():
-        sys.exit("Could not find What The Dub?!. Pass --game-dir \"<folder with WhatTheDub.exe>\".")
+    if not game or not is_game_dir(game):
+        sys.exit("Could not find What The Dub?!. Pass --game-dir \"<game folder>\" (Steam > Manage > Browse local files).")
     root = Path(game) / "CustomClips"
     root.mkdir(exist_ok=True)
     return root
 
 
 def find_ffmpeg():
-    for exe in (shutil.which("ffmpeg"), r"C:\ffmpeg\bin\ffmpeg.exe"):
+    local = os.environ.get("LOCALAPPDATA")
+    winget_link = local and str(Path(local) / "Microsoft" / "WinGet" / "Links" / "ffmpeg.exe")
+    for exe in (shutil.which("ffmpeg"), winget_link, r"C:\ffmpeg\bin\ffmpeg.exe"):
         if exe and Path(exe).exists():
             return exe
     return None

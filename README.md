@@ -9,7 +9,17 @@ A homebrew mod for [What The Dub?!](https://store.steampowered.com/app/1495860/W
 
 ## Install
 
-You need Windows and What The Dub?! on Steam.
+You need What The Dub?! on Steam. Works on:
+
+| Your computer | How the game runs | Installer |
+|---|---|---|
+| Windows | Windows game | `install.bat` |
+| Mac | Native Mac game | `install.sh` |
+| Linux, Steam Deck | Windows game through Proton | `install.sh` |
+
+The installer works out which one you have by itself.
+
+### Windows
 
 **Option A: download (easiest)**
 
@@ -27,6 +37,45 @@ WtdMorePlayers\install\install.bat
 The installer finds the game through Steam, installs the [BepInEx](https://github.com/BepInEx/BepInEx) mod
 loader, and adds the mod. When you clone the repo you don't need to build anything: the installer downloads
 the latest released mod file. If the game is installed somewhere unusual, it asks you for the folder.
+
+It also adds a Windows Firewall rule so phones on your network can reach the game. Windows asks for
+permission for this. If you say no, click **Allow** when Windows asks the first time the game starts.
+
+### Mac, Linux and Steam Deck
+
+1. Download `WtdMorePlayers.zip` from [Releases](https://github.com/SlothEater/WtdMorePlayers/releases/latest)
+   and extract it. (Steam Deck: do this in Desktop Mode.)
+2. Open a terminal in the extracted folder and run:
+   ```
+   bash install.sh
+   ```
+3. The installer ends by printing one line to paste into Steam: right-click What The Dub?! > **Properties** >
+   **General** > **Launch Options**. It's one of these:
+   - **Mac:** `"/path/to/WhatTheDub/run_bepinex.sh" %command%` (the installer prints your exact path)
+   - **Linux / Steam Deck:** `WINEDLLOVERRIDES="winhttp=n,b" %command%`
+
+   This tells Steam to start the mod loader with the game. Without it the game starts without the mod.
+
+On Linux, if the `ufw` firewall is on, the installer tells you the command that lets phones connect. On a Mac,
+click **Allow** if macOS asks whether the game may accept incoming connections. To add clip packs, run
+`bash add-clip-pack.sh MyPack.zip` (it offers to install Python and ffmpeg if they're missing).
+
+> The Mac and Proton modes use the official BepInEx builds for those systems and were tested up to the install
+> step. They haven't been played on a real Mac or Steam Deck yet. If something goes wrong, please open an
+> [issue](https://github.com/SlothEater/WtdMorePlayers/issues) with `BepInEx/LogOutput.log`.
+
+### What you need, and what's automatic
+
+| Needed | How you get it |
+|---|---|
+| What The Dub?! on Steam | Your own copy. Nothing from the game is included here. |
+| BepInEx mod loader | Downloaded by the installer. |
+| The mod | In the zip, or downloaded by the installer. |
+| The phone page players join on | **Automatic.** Each time the game starts, the mod downloads the official page from playwtd.com, adds the extra vote buttons and serves it from your PC. It's never stored in this repo. The last copy is kept in `BepInEx\cache`, so it still works if you're offline later. The very first launch needs internet. |
+| Firewall permission | Windows: added by the installer (asks for permission). Mac/Linux: see above. |
+| Network set to **Private** | Windows: the installer warns you if it isn't. Windows blocks phones on *Public* networks. |
+| Steam launch option | Mac/Linux only: the installer prints the line to paste. |
+| Python and ffmpeg | **Only** for adding clip packs. `Add Clip Pack.bat` / `add-clip-pack.sh` offer to install them. |
 
 ## Playing
 
@@ -65,7 +114,8 @@ in the settings window (F8). Your clips show their pack name on screen while the
 The game only plays **H.264 MP4** videos. If a pack has other formats, or its subtitles overlap or run past the
 end of the clip, **drag the pack (zip or folder) onto `Add Clip Pack.bat`** (in the download, or
 `tools\clip-packs` in the repo). It converts the videos, fixes the subtitles, and copies the pack into
-`CustomClips`. It needs [Python](https://www.python.org/downloads/) and [ffmpeg](https://www.gyan.dev/ffmpeg/builds/).
+`CustomClips`. It needs [Python](https://www.python.org/downloads/) and [ffmpeg](https://www.gyan.dev/ffmpeg/builds/),
+and offers to install both with winget if they're missing.
 
 ```
 python tools\clip-packs\wtd_pack.py add MyPack.zip     # add or convert a pack
@@ -102,7 +152,8 @@ of playback. Around 12 to 16 players feels best.
 
 ## Uninstall
 
-Double-click **`uninstall.bat`**. It removes the mod and BepInEx, and the game goes back to normal.
+Double-click **`uninstall.bat`**. It removes the mod, BepInEx and the firewall rule, and the game goes back to normal.
+On Mac/Linux run `bash uninstall.sh`, then clear the Launch Options box in Steam.
 Your `CustomClips` folder is kept. Delete it yourself if you don't want your clips any more.
 
 ## Troubleshooting
@@ -113,12 +164,18 @@ Your `CustomClips` folder is kept. Delete it yourself if you don't want your cli
 **Phones can't open the address on the TV**
 - The phone must be on the same Wi-Fi as the PC, not mobile data or a guest network. Many guest networks
   block devices from seeing each other.
-- Check that Windows Firewall allows What The Dub?! (Windows Security > Firewall > Allow an app).
+- Run `install.bat` again and accept the permission prompt: it adds the firewall rule. Or check Windows
+  Security > Firewall > Allow an app, and allow What The Dub?! on Private networks.
+- Your PC's network must be set to Private (Settings > Network & internet > your connection).
 - Type the address exactly as shown, including `:8080`. If the browser complains, put `http://` in front.
 
 **The TV still says playwtd.com**
 The mod couldn't download or patch the phone page (no internet at startup, or playwtd.com changed). Players can
 still join at playwtd.com and get the 6-choice vote screen.
+
+**Mac/Linux: no settings window, the game looks normal**
+The mod loader didn't start. Check the Launch Options line in Steam (see install). If
+`BepInEx/LogOutput.log` doesn't exist in the game folder after starting the game, the loader never ran.
 
 **Something else broke**
 Send the log from `<game folder>\BepInEx\LogOutput.log` in an

@@ -1,14 +1,15 @@
 // Joins N isolated players to a What The Dub room, auto-dubs and auto-votes, logs phone-page JS errors.
-// Usage: node bots.js <ROOM> [count] [phone page URL]
+// Usage: node bots.js <ROOM> [count] [phone page URL] [name prefix]
 const { chromium } = require('playwright');
 
 if (!process.argv[2]) {
-  console.log('Usage: node bots.js <ROOM> [count=10] [site=https://playwtd.com/]');
+  console.log('Usage: node bots.js <ROOM> [count=10] [site=https://playwtd.com/] [prefix=BOT]');
   process.exit(1);
 }
 const ROOM = process.argv[2].toUpperCase();
 const COUNT = parseInt(process.argv[3] || '10', 10);
 const SITE = process.argv[4] || 'https://playwtd.com/';
+const PREFIX = process.argv[5] || 'BOT';
 const DUBS = [
   'I told you the soup was haunted', 'My lawyer is a goose', 'This is fine, mostly',
   'Who ordered the extra cheese', 'I can explain the llama', 'Not my tractor, not my problem',
@@ -24,7 +25,7 @@ const DUBS = [
 const log = (who, msg) => console.log(`${new Date().toISOString().slice(11, 19)} [${who}] ${msg}`);
 
 async function runBot(browser, i) {
-  const name = `BOT${i + 1}`;
+  const name = `${PREFIX}${i + 1}`;
   const ctx = await browser.newContext({ viewport: { width: 400, height: 800 } });
   const page = await ctx.newPage();
   page.on('pageerror', e => log(name, `PAGE ERROR: ${e.message}`));

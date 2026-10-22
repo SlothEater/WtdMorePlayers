@@ -18,7 +18,7 @@ using UnityEngine.UI;
 
 namespace WtdMorePlayers
 {
-    [BepInPlugin("com.wtd.moreplayers", "WTD More Players", "1.0.0")]
+    [BepInPlugin("com.wtd.moreplayers", "WTD More Players", "1.1.0")]
     public class Plugin : BaseUnityPlugin
     {
         internal const int VanillaMax = 6;
@@ -39,7 +39,7 @@ namespace WtdMorePlayers
 
             ExtendPlayerColors();
             new Harmony("com.wtd.moreplayers").PatchAll();
-            Log.LogInfo($"WTD More Players loaded, MaxPlayers = {MaxPlayers.Value}");
+            Log.LogInfo($"WTD More Players loaded on {GamePlatform.Name}, MaxPlayers = {MaxPlayers.Value}");
 
             CustomClips.EnsureFolder();
             LauncherWindow.Init();

@@ -55,13 +55,17 @@ namespace WtdMorePlayers
                 string readme = Path.Combine(RootDir, "README.txt");
                 if (!File.Exists(readme))
                 {
-                    File.WriteAllText(readme,
-                        "Put your own clip packs here, one folder per pack:\r\n\r\n" +
-                        "  CustomClips\\MyPack\\VideoClips\\clip1.mp4\r\n" +
-                        "  CustomClips\\MyPack\\Subtitles\\clip1.srt\r\n\r\n" +
-                        "An unzipped Dub Editor export already has this layout.\r\n" +
-                        "Every .mp4 needs a .srt with the same name, containing exactly one [male_dub] or [female_dub] line.\r\n" +
-                        "Videos must be H.264 MP4. To convert other videos, drag the pack onto 'Add Clip Pack.bat' from the mod download.\r\n");
+                    string convert = GamePlatform.IsWindows
+                        ? "drag the pack onto 'Add Clip Pack.bat' from the mod download."
+                        : "run: python3 wtd_pack.py add <pack.zip or folder>  (wtd_pack.py is in the mod download).";
+                    string text =
+                        "Put your own clip packs here, one folder per pack:\n\n" +
+                        "  CustomClips/MyPack/VideoClips/clip1.mp4\n" +
+                        "  CustomClips/MyPack/Subtitles/clip1.srt\n\n" +
+                        "An unzipped Dub Editor export already has this layout.\n" +
+                        "Every .mp4 needs a .srt with the same name, containing exactly one [male_dub] or [female_dub] line.\n" +
+                        "Videos must be H.264 MP4. To convert other videos, " + convert + "\n";
+                    File.WriteAllText(readme, GamePlatform.IsWindows || GamePlatform.IsWine ? text.Replace("\n", "\r\n") : text);
                 }
             }
             catch (Exception e)

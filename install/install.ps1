@@ -76,11 +76,38 @@ if ($local) {
     Write-Host 'Mod installed.'
 }
 
+# 3. Firewall: phones on the local network need to reach the phone page the game serves.
+#    The page itself is not shipped: the mod downloads it from playwtd.com when the game starts.
+$exe = Join-Path $GameDir 'WhatTheDub.exe'
+$ruleName = 'WTD More Players phone page'
+$firewallOk = [bool](Get-NetFirewallRule -DisplayName $ruleName -ErrorAction SilentlyContinue)
+if ($firewallOk) {
+    Write-Host 'Firewall rule already in place.'
+} else {
+    Write-Host 'Allowing phones on your network to connect (Windows will ask for permission)...'
+    $cmd = "New-NetFirewallRule -DisplayName '$ruleName' -Direction Inbound -Action Allow -Protocol TCP " +
+           "-Profile Private,Domain -Program '$($exe -replace "'", "''")' | Out-Null"
+    $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($cmd))
+    try {
+        Start-Process powershell -Verb RunAs -Wait -WindowStyle Hidden -ArgumentList '-NoProfile', '-EncodedCommand', $encoded
+    } catch {
+        Write-Host '  Permission was not given.' -ForegroundColor Yellow
+    }
+    $firewallOk = [bool](Get-NetFirewallRule -DisplayName $ruleName -ErrorAction SilentlyContinue)
+    if ($firewallOk) { Write-Host 'Firewall rule added.' }
+    else { Write-Host '  No firewall rule. When the game first starts, click Allow if Windows asks.' -ForegroundColor Yellow }
+}
+$profiles = Get-NetConnectionProfile -ErrorAction SilentlyContinue | Where-Object NetworkCategory -eq 'Public'
+if ($profiles) {
+    Write-Host "Your network '$($profiles[0].Name)' is set to Public, which blocks phones from connecting." -ForegroundColor Yellow
+    Write-Host '  Set it to Private: Settings > Network & internet > (your connection) > Private network.' -ForegroundColor Yellow
+}
+
 Write-Host ''
 Write-Host 'Done!' -ForegroundColor Green
 Write-Host 'Start What The Dub?! from Steam and host a game as usual.'
 Write-Host 'The TV will show an address like 192.168.1.20:8080 instead of playwtd.com -'
 Write-Host 'players on your Wi-Fi open that on their phones to join.'
-Write-Host 'If Windows asks whether What The Dub?! may use the network, click Allow (Private networks).'
+Write-Host 'The game needs internet the first time so the mod can fetch the phone page from playwtd.com.'
 Write-Host ''
 Write-Host "Settings: $GameDir\BepInEx\config\com.wtd.moreplayers.cfg (created after the first launch)"

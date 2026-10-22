@@ -45,4 +45,14 @@ if ($KeepBepInEx -or $others) {
     }
     Write-Host 'Removed BepInEx.'
 }
+$ruleName = 'WTD More Players phone page'
+if (Get-NetFirewallRule -DisplayName $ruleName -ErrorAction SilentlyContinue) {
+    $encoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes("Remove-NetFirewallRule -DisplayName '$ruleName'"))
+    try {
+        Start-Process powershell -Verb RunAs -Wait -WindowStyle Hidden -ArgumentList '-NoProfile', '-EncodedCommand', $encoded
+        Write-Host 'Removed firewall rule.'
+    } catch {
+        Write-Host "Firewall rule '$ruleName' left in place (permission not given)." -ForegroundColor Yellow
+    }
+}
 Write-Host 'Done. The game is back to normal.' -ForegroundColor Green
